@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        primaryMy: '#16A34A',
+        primaryMy: '#8018bd',
         backgroundMy: '#F4F4F5',
         borderMy: '#B5B5B5',
         'clt-1': '#333333',
@@ -59,17 +59,11 @@ export default {
         },
       },
       fontFamily: {
-        'inter-bold': ['inter-bold', 'serif'],
-        'inter-light': ['inter-light', 'serif'],
-        'inter-medium': ['inter-medium', 'serif'],
-        'inter-regular': ['inter-regular', 'serif'],
-        'inter-semibold': ['inter-semibold', 'serif'],
-        'inter-thin': ['inter-thin', 'serif'],
-        'rajdhani-bold': ['rajdhani-bold', 'sans-serif'],
-        'rajdhani-medium': ['rajdhani-medium', 'sans-serif'],
-        'rajdhani-light': ['rajdhani-light', 'sans-serif'],
-        'rajdhani-regular': ['rajdhani-regular', 'sans-serif'],
-        'rajdhani-semibold': ['rajdhani-semibold', 'sans-serif'],
+        'space-bold': ['space-bold', 'serif'],
+        'space-light': ['space-light', 'serif'],
+        'space-medium': ['space-medium', 'serif'],
+        'space-regular': ['space-regular', 'serif'],
+        'space-semibold': ['space-semibold', 'serif'],
       },
       // borderRadius: {
       // 	lg: 'var(--radius)',

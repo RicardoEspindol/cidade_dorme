@@ -5,75 +5,35 @@
 /* font inter */
 
 @font-face {
-  font-family: 'inter-bold';
-  src: url('../public/fonts/Inter/Inter-Bold.ttf') format('opentype');
+  font-family: 'space-bold';
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Bold.ttf') format('opentype');
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: 'inter-light';
-  src: url('../public/fonts/Inter/Inter-Light.ttf') format('opentype');
+  font-family: 'space-light';
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Light.ttf') format('opentype');
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: 'inter-medium';
-  src: url('../public/fonts/Inter/Inter-Medium.ttf') format('opentype');
+  font-family: 'space-medium';
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Medium.ttf') format('opentype');
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: 'inter-regular';
-  src: url('../public/fonts/Inter/Inter-Regular.ttf') format('opentype');
+  font-family: 'space-regular';
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Regular.ttf') format('opentype');
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: 'inter-semibold';
-  src: url('../public/fonts/Inter/Inter-SemiBold.ttf') format('opentype');
+  font-family: 'space-semibold';
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-SemiBold.ttf') format('opentype');
   font-style: normal;
   font-display: swap;
 }
-@font-face {
-  font-family: 'inter-thin';
-  src: url('../public/fonts/Inter/Inter-Thin.ttf') format('opentype');
-  font-style: normal;
-  font-display: swap;
-}
-
-/* font Rajdhani */
-
-@font-face {
-  font-family: 'rajdhani-bold';
-  src: url('../public/fonts/Rajdhani/Rajdhani-Bold.ttf') format('opentype');
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'rajdhani-light';
-  src: url('../public/fonts/Rajdhani/Rajdhani-Light.ttf') format('opentype');
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'rajdhani-medium';
-  src: url('../public/fonts/Rajdhani/Rajdhani-Medium.ttf') format('opentype');
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'rajdhani-regular';
-  src: url('../public/fonts/Rajdhani/Rajdhani-Regular.ttf') format('opentype');
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'rajdhani-semibold';
-  src: url('../public/fonts/Rajdhani/Rajdhani-SemiBold.ttf') format('opentype');
-  font-style: normal;
-  font-display: swap;
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -137,4 +97,8 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.div{
+  background-color: #8018bd;
 }
