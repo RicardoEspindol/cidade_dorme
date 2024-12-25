@@ -6,31 +6,36 @@
 
 @font-face {
   font-family: 'space-bold';
-  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Bold.ttf') format('opentype');
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Bold.ttf')
+    format('opentype');
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'space-light';
-  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Light.ttf') format('opentype');
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Light.ttf')
+    format('opentype');
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'space-medium';
-  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Medium.ttf') format('opentype');
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Medium.ttf')
+    format('opentype');
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'space-regular';
-  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Regular.ttf') format('opentype');
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-Regular.ttf')
+    format('opentype');
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'space-semibold';
-  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-SemiBold.ttf') format('opentype');
+  src: url('../public/fonts/SpaceGrotesk/SpaceGrotesk-SemiBold.ttf')
+    format('opentype');
   font-style: normal;
   font-display: swap;
 }
@@ -99,6 +104,26 @@
   }
 }
 
-.div{
+.div {
   background-color: #8018bd;
+}
+
+/* ::selection {
+  background-color: #bbff34;
+  color: #141D2B;
+} */
+
+::-webkit-scrollbar {
+  width: 8px; /* Largura da barra de rolagem */
+}
+
+/* Estilizando o botão de rolagem */
+::-webkit-scrollbar-thumb {
+  background-color: #8018bd; /* Cor do botão de rolagem */
+  border-radius: 4px; /* Borda arredondada */
+}
+
+/* Estilizando a barra de rolagem quando o cursor está sobre ela */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #8835b8; /* Cor do botão de rolagem quando o cursor está sobre ela */
 }
