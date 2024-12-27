@@ -6,6 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { Link } from 'react-router-dom';
 
 function Instructions() {
   return (
@@ -267,6 +268,32 @@ function Instructions() {
                         durante o jogo.
                       </li>
                     </ol>
+                  </div>
+                </CardContent>
+              </Card>
+            </CarouselItem>
+            <CarouselItem>
+              <Card className='bg-transparent border-none shadow-none w-full h-96'>
+                <CardContent className='flex flex-col p-6 gap-y-6 h-full w-full'>
+                  <p className='font-space-medium text-2xl text-black pr-5'>
+                    Para onde ir agora?
+                  </p>
+                  <p className='font-space-regular text-black pr-2 mb-2'>
+                    Decida seu destino pequeno gafanhoto
+                  </p>
+                  <div className='overflow-y-auto h-full w-full flex items-center justify-center flex-col gap-y-6'>
+                    <Link
+                      to={'/'}
+                      className='w-full h-10 rounded-lg bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center'
+                    >
+                      Jogar
+                    </Link>
+                    <Link
+                      to={'/'}
+                      className='w-full h-10 rounded-lg bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center'
+                    >
+                      Ir para tela de Home
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
