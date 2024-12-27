@@ -1,4 +1,5 @@
 import ButtonRoom from '@/components/ButtonRoom';
+import CreateRoom from '@/components/CreateRoom';
 
 function Room() {
   return (
@@ -18,6 +19,7 @@ function Room() {
           <ButtonRoom name='Cabaré da Nice' quant={2} max={9} />
           <ButtonRoom name='Prainha do Soró' quant={7} max={7} />
           <ButtonRoom name='Fundo de Quintal' quant={4} max={2} />
+          <CreateRoom />
         </div>
       </div>
     </div>
