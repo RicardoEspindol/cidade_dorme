@@ -81,31 +81,31 @@ function ButtonRoom({ name, quant, max }: IButtonRoom) {
         <AlertDialogHeader>
           <AlertDialogTitle className='font-space-regular'>Entrar na Sala</AlertDialogTitle>
           <AlertDialogDescription>
-            <div className='text-gray-800 font-space-regular'>Para continuar precisaremos de algumas informações:</div>
+            <div className='text-gray-900 font-space-regular '>Para continuar precisaremos de algumas informações:</div>
             <form
               onSubmit={handleSubmit(() => console.log('wwe'))}
               className='w-full gap-y-3 flex flex-col'
             >
               <div className='flex flex-col gap-y-3 w-full'>
+                <InputText
+                  label='Nick'
+                  type='text'
+                  register={register}
+                  error={errors.nick?.message}
+                  name='nick'
+                />
                 <InputPassword
                   label='Senha'
                   register={register}
                   error={errors.password?.message}
                   name='password'
                 />
-                <InputText
-                  label='Email'
-                  type='email'
-                  register={register}
-                  error={errors.nick?.message}
-                  name='nick'
-                />
               </div>
               <button
                 type='submit'
-                className={`mt-3 mb-3 rounded text-center h-9 w-full font-rajdhani-semibold text-white bg-primaryMy hover:bg-opacity-90`}
+                className={`mt-4 mb-2 rounded text-center h-9 w-full font-space-semibold text-white bg-primaryMy hover:bg-opacity-90`}
               >
-                bota
+                Entrar
               </button>
             </form>
           </AlertDialogDescription>

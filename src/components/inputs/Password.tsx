@@ -41,7 +41,7 @@ function InputPassword<T extends FieldValues>({
           onClick={togglePasswordVisibility}
           className='px-3 bg-purple-300 h-8 shadow-sm'
         >
-          {showPassword ? <EyeIcon2 /> : <EyeIcon />}
+          {showPassword ? <EyeIcon /> : <EyeIcon2 />}
         </button>
       </div>
       <p
