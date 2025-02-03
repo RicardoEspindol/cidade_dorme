@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 function Instructions() {
   return (
     <div className='h-full w-full flex justify-center items-center flex-col overflow-y-auto'>
-      <div className='flex items-center justify-between flex-col rounded-xl bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl gap-y-7'>
+      <div className='flex items-center justify-between flex-col rounded-xl bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl gap-y-7 border border-primaryMy'>
         <Carousel className='w-full'>
           <CarouselContent className='max-w-96'>
             <CarouselItem>

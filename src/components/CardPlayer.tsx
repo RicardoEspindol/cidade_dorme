@@ -5,7 +5,7 @@ interface ICardPlayer {
 }
 function CardPlayer({ name }: ICardPlayer) {
   return (
-    <div className='flex items-center justify-start p-3 gap-x-3'>
+    <div className='flex items-center justify-start p-3 gap-x-3 hover:bg-purple-400 hover:bg-opacity-50 rounded-md mr-1'>
       <Avatar
         name={name}
         variant='beam'

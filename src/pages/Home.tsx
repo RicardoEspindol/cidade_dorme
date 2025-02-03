@@ -1,7 +1,7 @@
 function Home() {
   return (
     <div className='h-full w-full flex justify-center items-center flex-col overflow-y-auto'>
-      <div className='flex items-center justify-between flex-col p-7 rounded-xl bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl'>
+      <div className='flex items-center justify-between flex-col p-7 rounded-xl bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl border border-primaryMy'>
         <h1 className='h-20 flex items-center justify-center font-space-bold text-5xl text-white underline decoration-white'>
           CIDADE DORME
         </h1>

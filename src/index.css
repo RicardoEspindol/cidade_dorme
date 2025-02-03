@@ -127,3 +127,7 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: #8835b8; /* Cor do botão de rolagem quando o cursor está sobre ela */
 }
+
+li::marker {
+  color: #8018bd; /* Cor apenas para os marcadores */
+}

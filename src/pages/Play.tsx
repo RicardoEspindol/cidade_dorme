@@ -6,7 +6,10 @@ function Play() {
   const selectedNames = getRandomNames(names, 16);
   return (
     <div className='h-full w-full flex justify-center items-center flex-col overflow-y-auto'>
-      <div className='flex items-center justify-between flex-col p-7 rounded-xl bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl w-[50%] max-h-[60%]'>
+      <div className='flex items-center justify-between flex-col p-7 rounded-xl bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl w-[50%] max-h-[65%] border border-primaryMy'>
+        <p className='font-space-medium text-2xl text-black pr-5 w-full mb-2'>
+          Iniciar Partida
+        </p>
         <div className='grid grid-cols-3 w-full h-full overflow-y-auto'>
           {selectedNames.map((name, index) => (
             <CardPlayer key={index} name={name} />
