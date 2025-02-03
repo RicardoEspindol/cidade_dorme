@@ -1,7 +1,6 @@
+import HousePlus from '../../public/icons/HousePlus';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useRef, useState } from 'react';
-import Group from '../../public/icons/Group';
-import Door from '../../public/icons/Door';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import {
@@ -14,27 +13,31 @@ import {
 } from '@/components/ui/alert-dialog';
 import InputPassword from './inputs/Password';
 import InputText from './inputs/Text';
-interface IButtonRoom {
-  name: string;
-  quant: number | string;
-  max: number | string;
-}
-const submitEnterSchema = z.object({
-  nick: z.string().min(5, 'Digite um nick válido').toLowerCase(),
+
+const submitCreateRoomSchema = z.object({
+  name: z.string().min(5, 'Digite um nick válido').toLowerCase(),
+  quant: z
+    .string()
+    .transform((val) => Number(val))
+    .refine((val) => Number.isInteger(val) && val > 0, {
+      message: 'Quantidade deve ser um inteiro positivo.',
+    })
+    .refine((val) => val >= 6 && val <= 10, {
+      message: 'Quantidade deve estar entre 6 e 10.',
+    }),
   password: z.string().min(5, 'A senha deve ter pelo menos 5 caracteres'),
 });
 
-type EnterFormData = z.infer<typeof submitEnterSchema>;
-
-function ButtonRoom({ name, quant, max }: IButtonRoom) {
+type CreateRoomFormData = z.infer<typeof submitCreateRoomSchema>;
+function CreateRoom() {
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<EnterFormData>({
-    resolver: zodResolver(submitEnterSchema),
+  } = useForm<CreateRoomFormData>({
+    resolver: zodResolver(submitCreateRoomSchema),
   });
 
   // Detecta o clique fora do diálogo
@@ -61,37 +64,34 @@ function ButtonRoom({ name, quant, max }: IButtonRoom) {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <button className='flex items-center justify-between w-full min-h-10 bg-primaryMy rounded-lg px-3 font-space-regular text-sm text-white hover:bg-opacity-90'>
-          <div className='flex gap-x-3'>
-            <Door />
-            <p>{name}</p>
-          </div>
-          <div className='flex gap-x-3'>
-            <p>
-              {quant}/{max}
-            </p>
-            <div className='mt-[1px]'>
-              <Group />
-            </div>
-          </div>
+        <button className='flex gap-x-3 items-center justify-center w-full min-h-10 bg-primaryMy rounded-lg font-space-medium text-sm text-white hover:bg-opacity-90 mt-4'>
+          <HousePlus />
+          <p className='uppercase'>Criar Sala</p>
         </button>
       </AlertDialogTrigger>
       <AlertDialogContent ref={dialogRef} className='w-72'>
         <AlertDialogHeader>
-          <AlertDialogTitle className='font-space-regular'>Entrar na Sala</AlertDialogTitle>
+          <AlertDialogTitle className='font-space-regular'>Criar Sala</AlertDialogTitle>
           <AlertDialogDescription>
-            <div className='text-gray-900 font-space-regular '>Para continuar precisaremos de algumas informações:</div>
+            <div className='text-gray-900 font-space-regular '>Forneça as informações necessárias:</div>
             <form
               onSubmit={handleSubmit(() => console.log('wwe'))}
               className='w-full gap-y-3 flex flex-col'
             >
               <div className='flex flex-col gap-y-3 w-full'>
                 <InputText
-                  label='Nick'
+                  label='Nome'
                   type='text'
                   register={register}
-                  error={errors.nick?.message}
-                  name='nick'
+                  error={errors.name?.message}
+                  name='name'
+                />
+                <InputText
+                  label='Quantidade de Participantes'
+                  type='number'
+                  register={register}
+                  error={errors.quant?.message}
+                  name='quant'
                 />
                 <InputPassword
                   label='Senha'
@@ -104,7 +104,7 @@ function ButtonRoom({ name, quant, max }: IButtonRoom) {
                 type='submit'
                 className={`mt-4 mb-2 rounded text-center h-9 w-full font-space-semibold text-white bg-primaryMy hover:bg-opacity-90`}
               >
-                Entrar
+                Criar
               </button>
             </form>
           </AlertDialogDescription>
@@ -114,4 +114,4 @@ function ButtonRoom({ name, quant, max }: IButtonRoom) {
   );
 }
 
-export default ButtonRoom;
+export default CreateRoom;
