@@ -5,6 +5,7 @@ import Base from './pages/Base';
 import Room from './pages/Room';
 import Play from './pages/Play';
 import Game from './pages/Game';
+import Page404 from './pages/Page404';
 
 function AppRoutes() {
   return (
@@ -16,6 +17,7 @@ function AppRoutes() {
           <Route path='/room' element={<Room />}></Route>
           <Route path='/play' element={<Play />}></Route>
           <Route path='/game' element={<Game />}></Route>
+          <Route path='*' element={<Page404 />}></Route>
         </Route>
       </Routes>
     </BrowserRouter>

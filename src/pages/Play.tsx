@@ -1,6 +1,7 @@
 import { getRandomNames } from '@/mocks/IconsData';
 import { names } from '@/mocks/IconsData';
 import CardPlayer from '@/components/CardPlayer';
+import { Link } from 'react-router-dom';
 
 function Play() {
   const selectedNames = getRandomNames(names, 16);
@@ -16,12 +17,18 @@ function Play() {
           ))}
         </div>
         <div className='flex w-full gap-x-6 mt-5'>
-          <button className='flex items-center justify-center w-full min-h-9 bg-primaryMy rounded-lg font-space-medium text-sm text-white hover:bg-opacity-90'>
+          <Link
+            to={'/room'}
+            className='flex items-center justify-center w-full min-h-9 bg-primaryMy rounded-lg font-space-medium text-sm text-white hover:bg-opacity-90'
+          >
             <p className='uppercase'>Destruir Sala</p>
-          </button>
-          <button className='flex items-center justify-center w-full min-h-9 bg-primaryMy rounded-lg font-space-medium text-sm text-white hover:bg-opacity-90'>
+          </Link>
+          <Link
+            to={'/game'}
+            className='flex items-center justify-center w-full min-h-9 bg-primaryMy rounded-lg font-space-medium text-sm text-white hover:bg-opacity-90'
+          >
             <p className='uppercase'>Iniciar Jogo</p>
-          </button>
+          </Link>
         </div>
       </div>
     </div>
