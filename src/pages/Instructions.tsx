@@ -283,7 +283,7 @@ function Instructions() {
                   </p>
                   <div className='overflow-y-auto h-full w-full flex items-center justify-center flex-col gap-y-6'>
                     <Link
-                      to={'/'}
+                      to={'/room'}
                       className='w-full h-10 rounded-lg bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center'
                     >
                       Jogar
