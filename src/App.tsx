@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import AppRoutes from './routes';
+import { Toaster } from './components/ui/toaster';
 import NoResponsive from './pages/Responsive';
 
 function App() {
@@ -15,7 +16,12 @@ function App() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-  return <>{isLargeScreen ? <AppRoutes /> : <NoResponsive />}</>;
+  return (
+    <>
+      <Toaster />
+      {isLargeScreen ? <AppRoutes /> : <NoResponsive />}
+    </>
+  );
 }
 
 export default App;
