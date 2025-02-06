@@ -4,6 +4,7 @@ import Group from '../../public/icons/Group';
 import Door from '../../public/icons/Door';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import Cookie from 'js-cookie';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -14,11 +15,16 @@ import {
 } from '@/components/ui/alert-dialog';
 import InputPassword from './inputs/Password';
 import InputText from './inputs/Text';
+import { useNavigate } from 'react-router-dom';
+import { joinRoom } from '@/integration/Room';
+
 interface IButtonRoom {
   name: string;
   quant: number | string;
   max: number | string;
+  codigo: string; // Adicionado para navegação
 }
+
 const submitEnterSchema = z.object({
   nick: z.string().min(5, 'Digite um nick válido').toLowerCase(),
   password: z.string().min(5, 'A senha deve ter pelo menos 5 caracteres'),
@@ -26,9 +32,10 @@ const submitEnterSchema = z.object({
 
 type EnterFormData = z.infer<typeof submitEnterSchema>;
 
-function ButtonRoom({ name, quant, max }: IButtonRoom) {
+function ButtonRoom({ name, quant, max, codigo }: IButtonRoom) {
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate(); // Hook para navegação
   const {
     register,
     handleSubmit,
@@ -37,7 +44,28 @@ function ButtonRoom({ name, quant, max }: IButtonRoom) {
     resolver: zodResolver(submitEnterSchema),
   });
 
-  // Detecta o clique fora do diálogo
+  async function onSubmit(data: EnterFormData) {
+    try {
+      const payload = {
+        nomeJogador: data.nick, // 🚀 Convertendo para o formato esperado
+        senha: data.password,
+      };
+      const response = await joinRoom(codigo, payload);
+      if (response.status === 200) {
+        Cookie.set('codigoSala', codigo);
+        Cookie.set('nick', data.nick);
+        navigate(`/play`);
+      } else {
+        alert('Erro ao entrar na sala.');
+      }
+    } catch (error) {
+      console.error(
+        'Falha ao entrar na sala. Verifique os dados e tente novamente.',
+        error
+      );
+    }
+  }
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -47,22 +75,21 @@ function ButtonRoom({ name, quant, max }: IButtonRoom) {
         setIsOpen(false);
       }
     }
-
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     } else {
       document.removeEventListener('mousedown', handleClickOutside);
     }
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
+
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <button className='flex items-center justify-between w-full min-h-10 bg-primaryMy rounded-lg px-3 font-space-regular text-sm text-white hover:bg-opacity-90'>
-          <div className='flex gap-x-3'>
+          <div className='flex gap-x-3 truncate'>
             <Door />
             <p>{name}</p>
           </div>
@@ -78,11 +105,15 @@ function ButtonRoom({ name, quant, max }: IButtonRoom) {
       </AlertDialogTrigger>
       <AlertDialogContent ref={dialogRef} className='w-72'>
         <AlertDialogHeader>
-          <AlertDialogTitle className='font-space-regular'>Entrar na Sala</AlertDialogTitle>
+          <AlertDialogTitle className='font-space-regular'>
+            Entrar na Sala
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            <div className='text-gray-900 font-space-regular '>Para continuar precisaremos de algumas informações:</div>
+            <div className='text-gray-900 font-space-regular '>
+              Para continuar, insira seu nome e senha da sala:
+            </div>
             <form
-              onSubmit={handleSubmit(() => console.log('wwe'))}
+              onSubmit={handleSubmit(onSubmit)}
               className='w-full gap-y-3 flex flex-col'
             >
               <div className='flex flex-col gap-y-3 w-full'>

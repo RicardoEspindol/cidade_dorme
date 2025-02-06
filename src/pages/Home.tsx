@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 function Home() {
   return (
@@ -8,10 +8,16 @@ function Home() {
           CIDADE DORME
         </h1>
         <div className='w-full h-36 flex flex-col justify-center items-center gap-y-6 mt-14'>
-          <Link to={'/room'} className='w-full h-10 rounded-lg bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center'>
+          <Link
+            to={'/room'}
+            className='w-full h-10 rounded-lg bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center'
+          >
             Jogar
           </Link>
-          <Link to={'/instructions'} className='w-full h-10 rounded-lg bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center'>
+          <Link
+            to={'/instructions'}
+            className='w-full h-10 rounded-lg bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center'
+          >
             Instruções
           </Link>
         </div>
