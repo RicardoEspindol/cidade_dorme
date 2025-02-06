@@ -5,7 +5,7 @@ import AvatarGame from '@/components/AvatarGame';
 import { getRandomNames } from '@/mocks/IconsData';
 import { names } from '@/mocks/IconsData';
 import { useState } from 'react';
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 import {
   Command,
   CommandEmpty,
@@ -13,12 +13,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command'
+} from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
+} from '@/components/ui/popover';
 import { CheckIcon } from '@radix-ui/react-icons';
 import Send from '../../public/icons/Send';
 
@@ -43,7 +43,7 @@ const frameworks = [
     value: 'astro',
     label: 'Astro',
   },
-]
+];
 
 function Game() {
   const [open, setOpen] = useState(false);
@@ -153,7 +153,7 @@ function Game() {
                                   setValue(
                                     currentValue === value ? '' : currentValue
                                   );
-                                  setOpen(false)
+                                  setOpen(false);
                                 }}
                               >
                                 {framework.label}

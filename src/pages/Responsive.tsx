@@ -20,10 +20,3 @@ function NoResponsive() {
 }
 
 export default NoResponsive;
-
-//  className='overflow-auto w-full'
-// style={{
-//   backgroundImage: `url(${backgroundImage})`,
-//   backgroundSize: 'cover',
-//   backgroundPosition: 'center',
-// }}
