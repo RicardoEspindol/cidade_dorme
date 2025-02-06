@@ -2,7 +2,8 @@
 FROM node:18 AS build
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN npm install -g pnpm
+RUN pnpm install --no-frozen-lockfile
 COPY . .
 RUN pnpm run build
 
