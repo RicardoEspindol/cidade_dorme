@@ -1,4 +1,3 @@
-
 interface IEyeIcon2 {
   fill?: string;
 }

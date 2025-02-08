@@ -1,4 +1,3 @@
-
 interface ISend {
   fill?: string;
 }

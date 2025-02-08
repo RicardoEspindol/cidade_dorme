@@ -37,13 +37,18 @@ const submitCreateRoomSchema = z.object({
 });
 
 type CreateRoomFormData = z.infer<typeof submitCreateRoomSchema>;
-function CreateRoom({ setRooms }: { setRooms: React.Dispatch<React.SetStateAction<Sala[]>> }){
+function CreateRoom({
+  setRooms,
+}: {
+  setRooms: React.Dispatch<React.SetStateAction<Sala[]>>;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<CreateRoomFormData>({
     resolver: zodResolver(submitCreateRoomSchema),
@@ -106,6 +111,7 @@ function CreateRoom({ setRooms }: { setRooms: React.Dispatch<React.SetStateActio
         });
 
         setIsOpen(false);
+        reset();
       }
     } catch (error) {
       console.error('Erro ao criar sala:', error);
