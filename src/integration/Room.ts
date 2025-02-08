@@ -40,7 +40,6 @@ export const joinRoom = async (roomId: string, data: IJoinRoom) => {
   }
 };
 
-
 export const getRooms = async () => {
   try {
     const response = await api({
@@ -66,6 +65,18 @@ export const getRoomId = async (roomId: string) => {
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Erro ao buscar jogadores', error);
+    }
+    throw error;
+  }
+};
+
+export const initGame = async (codRoom: string) => {
+  try {
+    const response = await api.post(`/Jogo/iniciar-jogo/${codRoom}`, {});
+    return response;
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Erro ao entrar na sala', error);
     }
     throw error;
   }

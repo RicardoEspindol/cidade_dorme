@@ -66,7 +66,6 @@ function Room() {
                   codigo={item.codigo} // Passando o código da sala
                 />
               ))}
-
             </div>
             <CreateRoom setRooms={setRooms} />
           </div>

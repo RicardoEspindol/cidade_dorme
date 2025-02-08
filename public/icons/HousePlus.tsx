@@ -1,4 +1,3 @@
-
 function HousePlus() {
   return (
     <svg
