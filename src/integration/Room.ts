@@ -39,7 +39,6 @@ export const joinRoom = async (roomId: string, data: IJoinRoom) => {
     throw error;
   }
 };
-
 export const getRooms = async () => {
   try {
     const response = await api({

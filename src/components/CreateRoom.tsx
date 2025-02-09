@@ -24,15 +24,6 @@ const submitCreateRoomSchema = z.object({
     .toLowerCase()
     .max(15, 'Menos de 15 dígitos por favor')
     .toLowerCase(),
-  quant: z
-    .string()
-    .transform((val) => Number(val))
-    .refine((val) => Number.isInteger(val) && val > 0, {
-      message: 'Quantidade deve ser um inteiro positivo.',
-    })
-    .refine((val) => val >= 6 && val <= 10, {
-      message: 'Quantidade deve estar entre 6 e 10.',
-    }),
   password: z.string().min(5, 'A senha deve ter pelo menos 5 caracteres'),
 });
 
@@ -82,7 +73,7 @@ function CreateRoom({
       const response = await createRoom({
         nome: data.name,
         senha: data.password,
-        quantidadeJogadores: data.quant,
+        quantidadeJogadores: 6,
       });
 
       if (response.status === 200) {
@@ -99,7 +90,7 @@ function CreateRoom({
             investigado: null,
             votos: {},
           },
-          quantidadeJogadores: data.quant,
+          quantidadeJogadores: 6,
         };
 
         // Atualiza a lista de salas sem recarregar a página
@@ -148,13 +139,6 @@ function CreateRoom({
                   register={register}
                   error={errors.name?.message}
                   name='name'
-                />
-                <InputText
-                  label='Quantidade de Participantes'
-                  type='number'
-                  register={register}
-                  error={errors.quant?.message}
-                  name='quant'
                 />
                 <InputPassword
                   label='Senha'
