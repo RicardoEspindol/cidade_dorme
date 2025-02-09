@@ -80,3 +80,15 @@ export const initGame = async (codRoom: string) => {
     throw error;
   }
 };
+
+export const destroyRoom = async (codRoom: string) => {
+  try {
+    const response = await api.delete(`/Jogo/destruir-sala/${codRoom}`, {});
+    return response;
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Erro ao destruir sala', error);
+    }
+    throw error;
+  }
+};

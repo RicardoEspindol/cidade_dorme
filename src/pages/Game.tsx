@@ -54,6 +54,10 @@ function Game() {
   const [playersAlive, setPlayersAlive] = useState<Player[]>([]);
   const [playersEliminated, setPlayersEliminated] = useState<Player[]>([]);
   const [sala, setSala] = useState<GameData>()!;
+  const nick = Cookie.get('nick'); // Obtendo o nome do jogador salvo no cookie
+
+  // Filtrando o jogador correspondente na lista de jogadores
+  const jogadorReal = sala?.jogadores?.find((player) => player.nome === nick);
 
   const id = Cookie.get('codigoSala');
   if (!id) {
@@ -120,10 +124,10 @@ function Game() {
                     />
                     <div className='flex flex-col items-start'>
                       <p className='font-space-bold text-2xl text-black capitalize'>
-                        {sala?.jogadores[1].nome}
+                        {jogadorReal?.nome || 'Nome não encontrado'}
                       </p>
                       <p className='font-space-regular text-sm text-black capitalize'>
-                        {sala?.jogadores[1].papel}
+                        {jogadorReal?.papel || 'Papel não encontrado'}
                       </p>
                     </div>
                   </div>

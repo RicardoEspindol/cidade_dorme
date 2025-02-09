@@ -1,10 +1,10 @@
 import { getRandomNames } from '@/mocks/IconsData';
 import { names } from '@/mocks/IconsData';
 import CardPlayer from '@/components/CardPlayer';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Cookie from 'js-cookie';
 import { useEffect, useState } from 'react';
-import { getRoomId, initGame } from '@/integration/Room';
+import { destroyRoom, getRoomId, initGame } from '@/integration/Room';
 import LoadingIcon from '../../public/icons/Loading';
 
 interface Player {
@@ -32,6 +32,17 @@ function Play() {
       navigate('/game'); // Redireciona para /game após iniciar o jogo
     } catch (error) {
       console.error('Erro ao iniciar o jogo:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const destroyGameFunction = async () => {
+    try {
+      setIsLoading(true);
+      await destroyRoom(id);
+      navigate('/room'); // Redireciona para /game após iniciar o jogo
+    } catch (error) {
+      console.error('Erro ao destruir o jogo:', error);
     } finally {
       setIsLoading(false);
     }
@@ -101,12 +112,12 @@ function Play() {
               ))}
             </div>
             <div className='flex w-full gap-x-6 mt-5'>
-              <Link
-                to={'/room'}
+              <button
+                onClick={destroyGameFunction}
                 className='flex items-center justify-center w-full min-h-9 bg-primaryMy rounded-lg font-space-medium text-sm text-white hover:bg-opacity-90'
               >
                 <p className='uppercase'>Destruir Sala</p>
-              </Link>
+              </button>
               <button
                 onClick={initGameFunction}
                 className='flex items-center justify-center w-full min-h-9 bg-primaryMy rounded-lg font-space-medium text-sm text-white hover:bg-opacity-90'
