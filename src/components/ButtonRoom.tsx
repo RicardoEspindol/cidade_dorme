@@ -32,7 +32,7 @@ const submitEnterSchema = z.object({
 
 type EnterFormData = z.infer<typeof submitEnterSchema>;
 
-function ButtonRoom({ name, quant, max, codigo }: IButtonRoom) {
+function ButtonRoom({ name, max, codigo }: IButtonRoom) {
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate(); // Hook para navegação
@@ -94,9 +94,7 @@ function ButtonRoom({ name, quant, max, codigo }: IButtonRoom) {
             <p>{name}</p>
           </div>
           <div className='flex gap-x-3'>
-            <p>
-              {quant}/{max}
-            </p>
+            <p>{max}</p>
             <div className='mt-[1px]'>
               <Group />
             </div>

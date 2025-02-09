@@ -1,7 +1,7 @@
 import { getRandomNames } from '@/mocks/IconsData';
 import { names } from '@/mocks/IconsData';
 import CardPlayer from '@/components/CardPlayer';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Cookie from 'js-cookie';
 import { useEffect, useState } from 'react';
 import { getRoomId, initGame } from '@/integration/Room';
@@ -20,10 +20,22 @@ function Play() {
   const [playerNames, setPlayerNames] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [nameRoom, setNameRoom] = useState('');
+  const navigate = useNavigate();
 
   if (!id) {
     throw new Error('Sala não encontrada.');
   }
+  const initGameFunction = async () => {
+    try {
+      setIsLoading(true);
+      await initGame(id);
+      navigate('/game'); // Redireciona para /game após iniciar o jogo
+    } catch (error) {
+      console.error('Erro ao iniciar o jogo:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -62,11 +74,6 @@ function Play() {
 
     fetchPlayers();
   }, [id]);
-  console.log(nameRoom)
-
-  // const initGameFunction = () => {
-  //   initGame(id);
-  // }
 
   return (
     <>
@@ -101,7 +108,7 @@ function Play() {
                 <p className='uppercase'>Destruir Sala</p>
               </Link>
               <button
-                onClick={() => initGame(id)}
+                onClick={initGameFunction}
                 className='flex items-center justify-center w-full min-h-9 bg-primaryMy rounded-lg font-space-medium text-sm text-white hover:bg-opacity-90'
               >
                 <p className='uppercase'>Iniciar Jogo</p>
