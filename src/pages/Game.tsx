@@ -22,7 +22,7 @@ import Send from '../../public/icons/Send';
 import { getRoomId } from '@/integration/Room';
 import Cookie from 'js-cookie';
 import LoadingIcon from '../../public/icons/Loading';
-import { cityVote } from '@/integration/Vote';
+import { angelSave, cityVote, detectiveAccuse, monsterAttack, processTurn } from '@/integration/Vote';
 
 interface Player {
   conexaoId: string;
@@ -45,7 +45,7 @@ interface GameState {
   votos: Record<string, number>;
 }
 
-interface GameData {
+export interface GameData {
   nome: string;
   codigo: string;
   senha: string;
@@ -90,6 +90,16 @@ function Game() {
           setPlayersAlive(vivos);
           setPlayersEliminated(eliminados);
         }
+
+        if (
+          response?.estado?.fase === 'Noite' && // Só processa na fase "Noite"
+          response?.estado?.vitima !== null &&
+          response?.estado?.protegido !== null &&
+          response?.estado?.investigado !== null
+        ) {
+          console.log('Todos os votos foram registrados. Processando turno...');
+          await processTurn(id); // Chama a função para processar o turno
+        }
       } catch (error) {
         console.error('Erro ao buscar jogadores:', error);
       } finally {
@@ -108,15 +118,42 @@ function Game() {
       alert('Selecione um jogador antes de votar.');
       return;
     }
+
     setIsLoading(true);
     try {
-      const response = await cityVote(id, {
-        nomeJogador: nick!,
-        nomeVotado: value,
-      });
+      if (sala?.estado.fase === 'Dia') {
+        // Durante o dia, todos usam cityVote
+        const response = await cityVote(id, {
+          nomeJogador: nick!,
+          nomeVotado: value,
+        });
+        console.log('Voto enviado para cityVote:', response.data);
+      } else {
+        // Durante a noite, a rota depende do papel do jogador
+        let response;
+        const voteData = { vote: value };
 
-      console.log('Voto enviado com sucesso:', response.data);
-      alert('Voto registrado!');
+        switch (jogadorReal?.papel) {
+          case 'Monstro':
+            response = await monsterAttack(id, voteData);
+            console.log('Voto de Monstro:', response.data);
+            break;
+          case 'Detetive':
+            response = await detectiveAccuse(id, voteData);
+            console.log('Voto de Detetive:', response.data);
+            break;
+          case 'Anjo':
+            response = await angelSave(id, voteData);
+            console.log('Voto de Anjo:', response.data);
+            break;
+          default:
+            alert('Você não pode votar durante a noite.');
+            setIsLoading(false);
+            return;
+        }
+      }
+
+      alert('Voto registrado com sucesso!');
     } catch (error) {
       console.error('Erro ao enviar voto:', error);
       alert('Erro ao registrar o voto. Tente novamente.');
@@ -128,6 +165,8 @@ function Game() {
   const ultimaMensagemSistema = sala?.estado?.mensagens
     ?.filter((msg) => msg.nomeJogador === 'Sistema')
     ?.at(-1); // Pegando a última mensagem
+
+  console.log(sala?.jogoIniciado);
 
   return (
     <>
@@ -220,9 +259,10 @@ function Game() {
                         : ' Acordada'}
                     </p>
                   </div>
-                  {jogadorReal?.papel === 'Monstro' ||
-                  jogadorReal?.papel === 'Detetive' ||
-                  jogadorReal?.papel === 'Anjo' ? (
+                  {(sala?.estado.fase === 'Dia' ||
+                    jogadorReal?.papel === 'Monstro' ||
+                    jogadorReal?.papel === 'Detetive' ||
+                    jogadorReal?.papel === 'Anjo') && (
                     <div className='flex flex-col items-start justify-start w-1/2 pl-4'>
                       <p className='font-space-medium text-black text-lg'>
                         Votação:
@@ -241,7 +281,6 @@ function Game() {
                           <button
                             onClick={handleVote}
                             className='w-12 h-8 rounded-sm bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center disabled:cursor-not-allowed'
-
                           >
                             <Send fill='#fff' />
                           </button>
@@ -286,7 +325,7 @@ function Game() {
                         </Popover>
                       </div>
                     </div>
-                  ) : null}
+                  )}
                 </div>
               </div>
               <div className='h-full min-w-56'>

@@ -4,13 +4,9 @@ interface IVote {
   vote: string;
 }
 
-export const monsterAttack = async (codRoom: string, data: string) => {
+export const monsterAttack = async (codRoom: string, data: IVote) => {
   try {
-    const response = await api.post(`/Jogo/monstro-atacar/${codRoom}`, data, {
-      headers: {
-        'Content-Type': 'application/json', // Define que é JSON puro
-      },
-    });
+    const response = await api.post(`/Jogo/monstro-atacar/${codRoom}`, data);
     return response;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
@@ -22,11 +18,7 @@ export const monsterAttack = async (codRoom: string, data: string) => {
 
 export const angelSave = async (codRoom: string, data: IVote) => {
   try {
-    const response = await api.post(`/Jogo/anjo-salvar/${codRoom}`, data, {
-      headers: {
-        'Content-Type': 'application/json', // Define que é JSON puro
-      },
-    });
+    const response = await api.post(`/Jogo/anjo-salvar/${codRoom}`, data);
     return response;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
@@ -36,17 +28,9 @@ export const angelSave = async (codRoom: string, data: IVote) => {
   }
 };
 
-export const detectiveAccuse = async (codRoom: string, data: string) => {
+export const detectiveAccuse = async (codRoom: string, data: IVote) => {
   try {
-    const response = await api.post(
-      `/Jogo/detetive-acusar/${codRoom}`,
-      { value: data },
-      {
-        headers: {
-          'Content-Type': 'application/json', // Define que é JSON puro
-        },
-      }
-    );
+    const response = await api.post(`/Jogo/detetive-acusar/${codRoom}`, data);
     return response;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {

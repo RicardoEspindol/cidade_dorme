@@ -8,6 +8,7 @@ import { destroyRoom, getRoomId, initGame } from '@/integration/Room';
 import LoadingIcon from '../../public/icons/Loading';
 import { toast } from '@/hooks/use-toast';
 import { AxiosError } from 'axios';
+import { GameData } from './Game';
 
 interface Player {
   nome: string;
@@ -22,11 +23,31 @@ function Play() {
   const [playerNames, setPlayerNames] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(true);
   const [nameRoom, setNameRoom] = useState('');
+  const [sala, setSala] = useState<GameData>()!;
   const navigate = useNavigate();
 
   if (!id) {
     throw new Error('Sala não encontrada.');
   }
+
+  useEffect(() => {
+      const fetchPlayers = async () => {
+      try {
+        const response = await getRoomId(id);
+        console.log('API Response:', response);
+        setSala(response);
+      } catch (error) {
+        console.error('Erro ao buscar jogadores:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlayers();
+    const interval = setInterval(fetchPlayers, 2000); // Atualização periódica
+
+    return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+  }, [id, setSala]);
   const initGameFunction = async () => {
     try {
       setIsLoading(true);
@@ -108,10 +129,16 @@ function Play() {
 
     fetchPlayers();
 
-    const interval = setInterval(fetchPlayers, 3000); // Atualização periódica
+    const interval = setInterval(fetchPlayers, 2000); // Atualização periódica
 
     return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
   }, [id]);
+
+  useEffect(() => {
+    if (sala && sala?.jogoIniciado) {
+      navigate('/game');
+    }
+  }, [sala, sala?.jogoIniciado]);
 
   return (
     <>
