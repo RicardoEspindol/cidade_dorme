@@ -108,7 +108,7 @@ function Play() {
 
     fetchPlayers();
 
-    const interval = setInterval(fetchPlayers, 5000); // Atualização periódica
+    const interval = setInterval(fetchPlayers, 3000); // Atualização periódica
 
     return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
   }, [id]);

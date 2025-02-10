@@ -11,6 +11,10 @@ interface IJoinRoom {
   senha: string;
 }
 
+interface ISendMessage {
+  nomeJogador: string;
+  conteudo: string;
+}
 export const createRoom = async (data: ICreateRoom) => {
   try {
     const response = await api.post('/Jogo/criar-sala', data);
@@ -88,6 +92,21 @@ export const destroyRoom = async (codRoom: string) => {
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Erro ao destruir sala', error);
+    }
+    throw error;
+  }
+};
+
+export const sendMessage = async (codigoDaSala: string, data: ISendMessage) => {
+  try {
+    const response = await api.post(
+      `/Jogo/enviar-mensagem/${codigoDaSala}`,
+      data
+    );
+    return response;
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Erro ao enviar mensagem', error);
     }
     throw error;
   }

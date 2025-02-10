@@ -4,11 +4,6 @@ interface IVote {
   vote: string;
 }
 
-interface ICity {
-  name: string;
-  vote: string;
-}
-
 export const monsterAttack = async (codRoom: string, data: string) => {
   try {
     const response = await api.post(`/Jogo/monstro-atacar/${codRoom}`, data, {
@@ -61,13 +56,14 @@ export const detectiveAccuse = async (codRoom: string, data: string) => {
   }
 };
 
-export const cityVote = async (codRoom: string, data: ICity) => {
+interface ICityVote {
+  nomeJogador: string,
+  nomeVotado: string
+}
+
+export const cityVote = async (codRoom: string, data: ICityVote) => {
   try {
-    const response = await api.post(`/Jogo/cidade-votar/${codRoom}`, data, {
-      headers: {
-        'Content-Type': 'application/json', // Define que é JSON puro
-      },
-    });
+    const response = await api.post(`/Jogo/cidade-votar/${codRoom}`, data);
     return response;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
