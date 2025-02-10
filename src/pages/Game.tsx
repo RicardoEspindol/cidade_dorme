@@ -22,6 +22,7 @@ import Send from '../../public/icons/Send';
 import { getRoomId } from '@/integration/Room';
 import Cookie from 'js-cookie';
 import LoadingIcon from '../../public/icons/Loading';
+import { detectiveAccuse, monsterAttack } from '@/integration/Vote';
 
 interface Player {
   conexaoId: string;
@@ -93,6 +94,25 @@ function Game() {
 
     fetchPlayers();
   }, [id, setSala]);
+
+  const handleVote = async () => {
+    if (!value) {
+      alert('Selecione um jogador antes de votar.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await detectiveAccuse(id, value);
+
+      console.log('Voto enviado com sucesso:', response.data);
+      alert('Voto registrado!');
+    } catch (error) {
+      console.error('Erro ao enviar voto:', error);
+      alert('Erro ao registrar o voto. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -187,7 +207,7 @@ function Game() {
                       Votação:
                     </p>
                     <div className='flex items-center justify-between w-full'>
-                      <Popover open={open} onOpenChange={setOpen}>
+                      <Popover open={open} onOpenChange={setOpen} >
                         <PopoverTrigger asChild className='h-8'>
                           <button className='w-full h-8 bg-transparent border border-primaryMy justify-between text-start px-3 rounded-sm text-black font-space-medium text-sm mr-4'>
                             {value
@@ -197,7 +217,11 @@ function Game() {
                               : 'Selecione um player...'}
                           </button>
                         </PopoverTrigger>
-                        <button className='w-12  h-8 rounded-sm bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center'>
+                        <button
+                          onClick={handleVote}
+                          className='w-12 h-8 rounded-sm bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center disabled:cursor-not-allowed'
+                          disabled={sala?.estado.fase !== 'Noite'}
+                        >
                           <Send fill='#fff' />
                         </button>
                         <PopoverContent className='w-[200px] p-0'>
