@@ -131,19 +131,19 @@ function Game() {
       } else {
         // Durante a noite, a rota depende do papel do jogador
         let response;
-        const voteData = { vote: value };
+        const nomeJogador = { vote: value };
 
         switch (jogadorReal?.papel) {
           case 'Monstro':
-            response = await monsterAttack(id, voteData);
+            response = await monsterAttack(id, nomeJogador);
             console.log('Voto de Monstro:', response.data);
             break;
           case 'Detetive':
-            response = await detectiveAccuse(id, voteData);
+            response = await detectiveAccuse(id, nomeJogador);
             console.log('Voto de Detetive:', response.data);
             break;
           case 'Anjo':
-            response = await angelSave(id, voteData);
+            response = await angelSave(id, nomeJogador);
             console.log('Voto de Anjo:', response.data);
             break;
           default:

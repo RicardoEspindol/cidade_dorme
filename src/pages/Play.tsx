@@ -138,7 +138,7 @@ function Play() {
     if (sala && sala?.jogoIniciado) {
       navigate('/game');
     }
-  }, [sala, sala?.jogoIniciado]);
+  }, [navigate, sala, sala?.jogoIniciado]);
 
   return (
     <>
