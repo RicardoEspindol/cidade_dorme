@@ -18,7 +18,7 @@ function CardPlayer({ name, realName }: ICardPlayer) {
         <p className='font-space-regular text-sm truncate font-bold'>
           {realName}
         </p>
-        <p className='font-space-regular text-sm truncate text-gray-500'>
+        <p className='font-space-regular text-sm truncate text-gray-600'>
           ({name})
         </p>
       </div>
