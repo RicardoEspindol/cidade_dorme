@@ -1,7 +1,7 @@
 # Etapa de build
 FROM node:18 AS build
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
 RUN npm install -g pnpm
 RUN pnpm install --no-frozen-lockfile
 COPY . .
