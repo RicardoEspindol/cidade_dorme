@@ -22,7 +22,8 @@ import Send from '../../public/icons/Send';
 import { getRoomId } from '@/integration/Room';
 import Cookie from 'js-cookie';
 import LoadingIcon from '../../public/icons/Loading';
-import { angelSave, cityVote, detectiveAccuse, monsterAttack, processTurn } from '@/integration/Vote';
+import { angelSave, cityVote, countVotes, detectiveAccuse, monsterAttack, processTurn } from '@/integration/Vote';
+import { toast } from '@/hooks/use-toast';
 
 interface Player {
   conexaoId: string;
@@ -75,31 +76,47 @@ function Game() {
     const fetchPlayers = async () => {
       try {
         const response = await getRoomId(id);
-        console.log('API Response:', response);
         setSala(response);
 
         if (response && response.jogadores) {
-          // Separando jogadores vivos e eliminados com tipagem explícita
-          const vivos: Player[] = response.jogadores.filter(
-            (player: Player) => player.vivo
-          );
-          const eliminados: Player[] = response.jogadores.filter(
-            (player: Player) => !player.vivo
-          );
+          const vivos: Player[] = response.jogadores.filter((player: Player) => player.vivo);
+          const eliminados: Player[] = response.jogadores.filter((player: Player) => !player.vivo);
 
           setPlayersAlive(vivos);
           setPlayersEliminated(eliminados);
         }
 
+        // Lista de papéis que têm ações durante a noite
+        const poderes = ["Monstro", "Anjo", "Detetive"];
+
+        // Jogadores com poderes que ainda estão vivos
+        const jogadoresComPoderVivos = response?.jogadores?.filter(
+          (player: Player) => player.vivo && poderes.includes(player.papel)
+        );
+
+        // Contar quantos desses já votaram
+        const votosNoturnos = [
+          response?.estado?.vitima,
+          response?.estado?.protegido,
+          response?.estado?.investigado
+        ].filter(voto => voto !== null).length;
+
+        // Se todos os jogadores com poderes VIVOS já votaram, processamos o turno
         if (
-          response?.estado?.fase === 'Noite' && // Só processa na fase "Noite"
-          response?.estado?.vitima !== null &&
-          response?.estado?.protegido !== null &&
-          response?.estado?.investigado !== null
+          response?.estado?.fase === 'Noite' &&
+          votosNoturnos === jogadoresComPoderVivos.length
         ) {
-          console.log('Todos os votos foram registrados. Processando turno...');
-          await processTurn(id); // Chama a função para processar o turno
+          await processTurn(id);
         }
+
+        // Verifica se todos os jogadores vivos votaram durante o dia e apura os votos
+        const totalJogadoresVivos = response?.jogadores?.filter((player: Player) => player.vivo).length || 0;
+        const totalVotos = Object.keys(response?.estado?.votos || {}).length;
+
+        if (response?.estado?.fase === 'Dia' && totalVotos === totalJogadoresVivos) {
+          await countVotes(id);
+        }
+
       } catch (error) {
         console.error('Erro ao buscar jogadores:', error);
       } finally {
@@ -115,11 +132,8 @@ function Game() {
 
   const handleVote = async () => {
     if (!value) {
-      alert('Selecione um jogador antes de votar.');
       return;
     }
-
-    setIsLoading(true);
     try {
       if (sala?.estado.fase === 'Dia') {
         // Durante o dia, todos usam cityVote
@@ -127,7 +141,12 @@ function Game() {
           nomeJogador: nick!,
           nomeVotado: value,
         });
-        console.log('Voto enviado para cityVote:', response.data);
+        if (response.status === 200) {
+          toast({
+            title: 'Voto captado',
+            description: 'Aguardando apuração...',
+          });
+        }
       } else {
         // Durante a noite, a rota depende do papel do jogador
         let response;
@@ -136,37 +155,53 @@ function Game() {
         switch (jogadorReal?.papel) {
           case 'Monstro':
             response = await monsterAttack(id, nomeJogador);
-            console.log('Voto de Monstro:', response.data);
+            if (response.status === 200) {
+              toast({
+                title: 'Voto captado',
+                description: 'Monstro atacou...',
+              });
+            }
             break;
           case 'Detetive':
             response = await detectiveAccuse(id, nomeJogador);
-            console.log('Voto de Detetive:', response.data);
+            if (response.status === 200) {
+              toast({
+                title: 'Voto captado',
+                description: 'Detetive acusou...',
+              });
+            }
             break;
           case 'Anjo':
             response = await angelSave(id, nomeJogador);
-            console.log('Voto de Anjo:', response.data);
+            if (response.status === 200) {
+              toast({
+                title: 'Voto captado',
+                description: 'Anjo salvou...',
+              });
+            }
             break;
           default:
-            alert('Você não pode votar durante a noite.');
-            setIsLoading(false);
             return;
         }
       }
-
-      alert('Voto registrado com sucesso!');
     } catch (error) {
       console.error('Erro ao enviar voto:', error);
-      alert('Erro ao registrar o voto. Tente novamente.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const ultimaMensagemSistema = sala?.estado?.mensagens
     ?.filter((msg) => msg.nomeJogador === 'Sistema')
     ?.at(-1); // Pegando a última mensagem
+  const monstro = sala?.jogadores.find((jogador) => jogador.papel === "Monstro");
+  const cidadeVenceu = monstro && !monstro.vivo;
+  const jogoFinalizado = sala?.estado?.fase === "Finalizado";
 
-  console.log(sala?.jogoIniciado);
+  const mensagemFinal = jogoFinalizado
+    ? cidadeVenceu
+      ? "A cidade conseguiu derrotar o monstro! Vitória dos cidadãos! 🎉"
+      : "O monstro eliminou todos! Ele venceu! 😈"
+    : ultimaMensagemSistema?.conteudo || "Nenhuma mensagem do sistema";
+
 
   return (
     <>
@@ -180,7 +215,7 @@ function Game() {
       ) : (
         <div className='h-full w-full flex justify-center items-center flex-col overflow-y-auto'>
           <div className='w-[70%] h-12 bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl text-center flex items-center justify-center font-space-medium mb-5 rounded-md border border-primaryMy text-nowrap line-clamp-1 truncate uppercase'>
-            {ultimaMensagemSistema?.conteudo || 'Nenhuma mensagem do sistema'}
+            {mensagemFinal}
           </div>
           <div className='flex items-center justify-between flex-col p-7 rounded-lg bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl w-[70%] h-[75%] border border-primaryMy'>
             <div className='w-full h-full flex'>
@@ -260,36 +295,31 @@ function Game() {
                     </p>
                   </div>
                   {(sala?.estado.fase === 'Dia' ||
-                    jogadorReal?.papel === 'Monstro' ||
-                    jogadorReal?.papel === 'Detetive' ||
-                    jogadorReal?.papel === 'Anjo') && (
+                    (['Monstro', 'Detetive', 'Anjo'].includes(
+                      jogadorReal?.papel ?? ''
+                    ) &&
+                      jogadorReal?.vivo)) && (
                     <div className='flex flex-col items-start justify-start w-1/2 pl-4'>
-                      <p className='font-space-medium text-black text-lg'>
-                        Votação:
-                      </p>
+                      <p className='font-space-medium text-black text-lg'>Votação:</p>
                       <div className='flex items-center justify-between w-full'>
-                        <Popover open={open} onOpenChange={setOpen} >
+                        <Popover open={open} onOpenChange={setOpen}>
                           <PopoverTrigger asChild className='h-8'>
                             <button className='w-full h-8 bg-transparent border border-primaryMy justify-between text-start px-3 rounded-sm text-black font-space-medium text-sm mr-4'>
                               {value
-                                ? playersAlive.find(
-                                    (framework) => framework.nome === value
-                                  )?.nome
+                                ? playersAlive.find((framework) => framework.nome === value)?.nome
                                 : 'Selecione um player...'}
                             </button>
                           </PopoverTrigger>
                           <button
                             onClick={handleVote}
                             className='w-12 h-8 rounded-sm bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center disabled:cursor-not-allowed'
+                            disabled={!value}
                           >
                             <Send fill='#fff' />
                           </button>
                           <PopoverContent className='w-[200px] p-0'>
                             <Command>
-                              <CommandInput
-                                placeholder='Selecione um player...'
-                                className='h-9'
-                              />
+                              <CommandInput placeholder='Selecione um player...' className='h-9' />
                               <CommandList>
                                 <CommandEmpty>Nada corresponde...</CommandEmpty>
                                 <CommandGroup>
@@ -298,11 +328,7 @@ function Game() {
                                       key={framework.conexaoId}
                                       value={framework.nome}
                                       onSelect={(currentValue) => {
-                                        setValue(
-                                          currentValue === value
-                                            ? ''
-                                            : currentValue
-                                        );
+                                        setValue(currentValue === value ? '' : currentValue);
                                         setOpen(false);
                                       }}
                                       className='capitalize'
@@ -311,9 +337,7 @@ function Game() {
                                       <CheckIcon
                                         className={cn(
                                           'ml-auto',
-                                          value === framework.nome
-                                            ? 'opacity-100'
-                                            : 'opacity-0'
+                                          value === framework.nome ? 'opacity-100' : 'opacity-0'
                                         )}
                                       />
                                     </CommandItem>

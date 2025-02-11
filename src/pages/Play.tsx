@@ -34,7 +34,6 @@ function Play() {
       const fetchPlayers = async () => {
       try {
         const response = await getRoomId(id);
-        console.log('API Response:', response);
         setSala(response);
       } catch (error) {
         console.error('Erro ao buscar jogadores:', error);
@@ -97,7 +96,6 @@ function Play() {
     const fetchPlayers = async () => {
       try {
         const response = await getRoomId(id);
-        console.log('API Response:', response); // <-- Verifica o formato da resposta
         setNameRoom(response.nome);
         // Verifica se o campo 'jogadores' existe e é um array
         const playerList: Player[] = Array.isArray(response.jogadores)

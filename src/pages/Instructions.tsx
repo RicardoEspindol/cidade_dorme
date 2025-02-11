@@ -30,7 +30,7 @@ function Instructions() {
                       descobertos.
                     </li>
                     <li>
-                      Outros papéis, como detetive, anjo, e médico, têm funções
+                      Outros papéis, como detetive, e anjo têm funções
                       específicas para ajudar ou dificultar os objetivos das
                       equipes.
                     </li>
@@ -50,17 +50,14 @@ function Instructions() {
                     </p>
                     <ol className='list-inside list-disc pr-2 font-space-regular'>
                       <li>
-                        Número de Jogadores: De 6 a 15 (recomendado). O jogo se
+                        Número de Jogadores: De 6 a 10 (recomendado). O jogo se
                         adapta ao número de participantes para equilibrar os
                         papéis.
                       </li>
                       <li>
                         Distribuição de Papéis:
                         <ol className='list-inside list-disc ml-4'>
-                          <li>
-                            1 Monstro (2 ou mais, dependendo do número de
-                            jogadores)
-                          </li>
+                          <li>1 Monstro</li>
                           <li>1 Detetive</li>
                           <li>1 Anjo</li>
                           <li>Cidadãos para preencher o restante</li>
@@ -107,9 +104,6 @@ function Instructions() {
                             Detetive: Escolhe um jogador para investigar (recebe
                             uma resposta da IA se é monstro ou não).
                           </li>
-                          <li>
-                            Médico (se existir): Escolhe um jogador para curar.
-                          </li>
                         </ol>
                       </li>
                       <li>
@@ -135,7 +129,7 @@ function Instructions() {
                         <ol className='list-inside list-disc ml-4'>
                           <li>
                             Os jogadores discutem e compartilham suas suspeitas
-                            no chat ou por voz.
+                            no chat.
                           </li>
                         </ol>
                       </li>
@@ -256,8 +250,8 @@ function Instructions() {
                         automaticamente.
                       </li>
                       <li>
-                        Chat de texto e/ou voz integrado para facilitar a
-                        comunicação entre os jogadores.
+                        Chat de texto integrado para facilitar a comunicação
+                        entre os jogadores.
                       </li>
                       <li>
                         Menus interativos para realizar ações (como escolher
