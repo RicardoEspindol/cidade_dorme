@@ -150,11 +150,9 @@ function Game() {
       } else {
         // Durante a noite, a rota depende do papel do jogador
         let response;
-        const nomeJogador = { vote: value };
-
         switch (jogadorReal?.papel) {
           case 'Monstro':
-            response = await monsterAttack(id, nomeJogador);
+            response = await monsterAttack(id, { nomeJogador: value }); // Alteração aqui
             if (response.status === 200) {
               toast({
                 title: 'Voto captado',
@@ -163,7 +161,7 @@ function Game() {
             }
             break;
           case 'Detetive':
-            response = await detectiveAccuse(id, nomeJogador);
+            response = await detectiveAccuse(id, { nomeJogador: value }); // Alteração aqui
             if (response.status === 200) {
               toast({
                 title: 'Voto captado',
@@ -172,7 +170,7 @@ function Game() {
             }
             break;
           case 'Anjo':
-            response = await angelSave(id, nomeJogador);
+            response = await angelSave(id, { nomeJogador: value }); // Alteração aqui
             if (response.status === 200) {
               toast({
                 title: 'Voto captado',

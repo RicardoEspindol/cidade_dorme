@@ -31,7 +31,7 @@ function Play() {
   }
 
   useEffect(() => {
-      const fetchPlayers = async () => {
+    const fetchPlayers = async () => {
       try {
         const response = await getRoomId(id);
         setSala(response);

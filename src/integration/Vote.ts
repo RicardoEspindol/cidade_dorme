@@ -1,7 +1,7 @@
 import { api } from '@/services/BaseApi';
 
 interface IVote {
-  vote: string;
+  nomeJogador: string;
 }
 
 export const monsterAttack = async (codRoom: string, data: IVote) => {
