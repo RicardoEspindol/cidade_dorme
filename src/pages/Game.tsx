@@ -22,6 +22,7 @@ import Send from '../../public/icons/Send';
 import { getRoomId } from '@/integration/Room';
 import Cookie from 'js-cookie';
 import LoadingIcon from '../../public/icons/Loading';
+import { angelSave, cityVote, detectiveAccuse, monsterAttack, processTurn } from '@/integration/Vote';
 
 interface Player {
   conexaoId: string;
@@ -29,16 +30,22 @@ interface Player {
   papel: string;
   vivo: boolean;
 }
+interface IMensagem {
+  conteudo: string;
+  nomeJogador: string;
+  timestamp: Date;
+}
 
 interface GameState {
   fase: string;
   investigado: string | null;
   protegido: string | null;
+  mensagens: IMensagem[]; // ✅ CORRIGIDO
   vitima: string | null;
-  votos: Record<string, number>; // Caso os votos sejam um objeto com chaves dinâmicas
+  votos: Record<string, number>;
 }
 
-interface GameData {
+export interface GameData {
   nome: string;
   codigo: string;
   senha: string;
@@ -50,7 +57,7 @@ interface GameData {
 function Game() {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [playersAlive, setPlayersAlive] = useState<Player[]>([]);
   const [playersEliminated, setPlayersEliminated] = useState<Player[]>([]);
   const [sala, setSala] = useState<GameData>()!;
@@ -66,7 +73,6 @@ function Game() {
 
   useEffect(() => {
     const fetchPlayers = async () => {
-      setIsLoading(true);
       try {
         const response = await getRoomId(id);
         console.log('API Response:', response);
@@ -84,6 +90,16 @@ function Game() {
           setPlayersAlive(vivos);
           setPlayersEliminated(eliminados);
         }
+
+        if (
+          response?.estado?.fase === 'Noite' && // Só processa na fase "Noite"
+          response?.estado?.vitima !== null &&
+          response?.estado?.protegido !== null &&
+          response?.estado?.investigado !== null
+        ) {
+          console.log('Todos os votos foram registrados. Processando turno...');
+          await processTurn(id); // Chama a função para processar o turno
+        }
       } catch (error) {
         console.error('Erro ao buscar jogadores:', error);
       } finally {
@@ -92,7 +108,65 @@ function Game() {
     };
 
     fetchPlayers();
+    const interval = setInterval(fetchPlayers, 2000); // Atualização periódica
+
+    return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
   }, [id, setSala]);
+
+  const handleVote = async () => {
+    if (!value) {
+      alert('Selecione um jogador antes de votar.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (sala?.estado.fase === 'Dia') {
+        // Durante o dia, todos usam cityVote
+        const response = await cityVote(id, {
+          nomeJogador: nick!,
+          nomeVotado: value,
+        });
+        console.log('Voto enviado para cityVote:', response.data);
+      } else {
+        // Durante a noite, a rota depende do papel do jogador
+        let response;
+        const nomeJogador = { vote: value };
+
+        switch (jogadorReal?.papel) {
+          case 'Monstro':
+            response = await monsterAttack(id, nomeJogador);
+            console.log('Voto de Monstro:', response.data);
+            break;
+          case 'Detetive':
+            response = await detectiveAccuse(id, nomeJogador);
+            console.log('Voto de Detetive:', response.data);
+            break;
+          case 'Anjo':
+            response = await angelSave(id, nomeJogador);
+            console.log('Voto de Anjo:', response.data);
+            break;
+          default:
+            alert('Você não pode votar durante a noite.');
+            setIsLoading(false);
+            return;
+        }
+      }
+
+      alert('Voto registrado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao enviar voto:', error);
+      alert('Erro ao registrar o voto. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const ultimaMensagemSistema = sala?.estado?.mensagens
+    ?.filter((msg) => msg.nomeJogador === 'Sistema')
+    ?.at(-1); // Pegando a última mensagem
+
+  console.log(sala?.jogoIniciado);
 
   return (
     <>
@@ -105,6 +179,9 @@ function Game() {
         </div>
       ) : (
         <div className='h-full w-full flex justify-center items-center flex-col overflow-y-auto'>
+          <div className='w-[70%] h-12 bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl text-center flex items-center justify-center font-space-medium mb-5 rounded-md border border-primaryMy text-nowrap line-clamp-1 truncate uppercase'>
+            {ultimaMensagemSistema?.conteudo || 'Nenhuma mensagem do sistema'}
+          </div>
           <div className='flex items-center justify-between flex-col p-7 rounded-lg bg-purple-300 bg-opacity-50 backdrop-blur-sm shadow-2xl w-[70%] h-[75%] border border-primaryMy'>
             <div className='w-full h-full flex'>
               <div className='w-full h-full flex flex-col pr-4'>
@@ -182,69 +259,84 @@ function Game() {
                         : ' Acordada'}
                     </p>
                   </div>
-                  <div className='flex flex-col items-start justify-start w-1/2 pl-4'>
-                    <p className='font-space-medium text-black text-lg'>
-                      Votação:
-                    </p>
-                    <div className='flex items-center justify-between w-full'>
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild className='h-8'>
-                          <button className='w-full h-8 bg-transparent border border-primaryMy justify-between text-start px-3 rounded-sm text-black font-space-medium text-sm mr-4'>
-                            {value
-                              ? playersAlive.find(
-                                  (framework) => framework.nome === value
-                                )?.nome
-                              : 'Selecione um player...'}
+                  {(sala?.estado.fase === 'Dia' ||
+                    jogadorReal?.papel === 'Monstro' ||
+                    jogadorReal?.papel === 'Detetive' ||
+                    jogadorReal?.papel === 'Anjo') && (
+                    <div className='flex flex-col items-start justify-start w-1/2 pl-4'>
+                      <p className='font-space-medium text-black text-lg'>
+                        Votação:
+                      </p>
+                      <div className='flex items-center justify-between w-full'>
+                        <Popover open={open} onOpenChange={setOpen} >
+                          <PopoverTrigger asChild className='h-8'>
+                            <button className='w-full h-8 bg-transparent border border-primaryMy justify-between text-start px-3 rounded-sm text-black font-space-medium text-sm mr-4'>
+                              {value
+                                ? playersAlive.find(
+                                    (framework) => framework.nome === value
+                                  )?.nome
+                                : 'Selecione um player...'}
+                            </button>
+                          </PopoverTrigger>
+                          <button
+                            onClick={handleVote}
+                            className='w-12 h-8 rounded-sm bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center disabled:cursor-not-allowed'
+                          >
+                            <Send fill='#fff' />
                           </button>
-                        </PopoverTrigger>
-                        <button className='w-12  h-8 rounded-sm bg-primaryMy font-space-medium text-white uppercase hover:bg-opacity-90 flex items-center justify-center'>
-                          <Send fill='#fff' />
-                        </button>
-                        <PopoverContent className='w-[200px] p-0'>
-                          <Command>
-                            <CommandInput
-                              placeholder='Selecione um player...'
-                              className='h-9'
-                            />
-                            <CommandList>
-                              <CommandEmpty>Nada corresponde...</CommandEmpty>
-                              <CommandGroup>
-                                {playersAlive.map((framework) => (
-                                  <CommandItem
-                                    key={framework.conexaoId}
-                                    value={framework.nome}
-                                    onSelect={(currentValue) => {
-                                      setValue(
-                                        currentValue === value
-                                          ? ''
-                                          : currentValue
-                                      );
-                                      setOpen(false);
-                                    }}
-                                    className='capitalize'
-                                  >
-                                    {framework.nome}
-                                    <CheckIcon
-                                      className={cn(
-                                        'ml-auto',
-                                        value === framework.nome
-                                          ? 'opacity-100'
-                                          : 'opacity-0'
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                          <PopoverContent className='w-[200px] p-0'>
+                            <Command>
+                              <CommandInput
+                                placeholder='Selecione um player...'
+                                className='h-9'
+                              />
+                              <CommandList>
+                                <CommandEmpty>Nada corresponde...</CommandEmpty>
+                                <CommandGroup>
+                                  {playersAlive.map((framework) => (
+                                    <CommandItem
+                                      key={framework.conexaoId}
+                                      value={framework.nome}
+                                      onSelect={(currentValue) => {
+                                        setValue(
+                                          currentValue === value
+                                            ? ''
+                                            : currentValue
+                                        );
+                                        setOpen(false);
+                                      }}
+                                      className='capitalize'
+                                    >
+                                      {framework.nome}
+                                      <CheckIcon
+                                        className={cn(
+                                          'ml-auto',
+                                          value === framework.nome
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
               <div className='h-full min-w-56'>
-                <Chat />
+                <Chat
+                  mensagens={(sala?.estado?.mensagens || []).map((msg) => ({
+                    author: msg.nomeJogador, // Ajuste aqui para o nome correto
+                    message: msg.conteudo, // Ajuste conforme necessário
+                    time: msg.timestamp,
+                  }))}
+                  ican={sala?.estado.fase ? sala?.estado.fase : 'oloko'}
+                />
               </div>
             </div>
           </div>

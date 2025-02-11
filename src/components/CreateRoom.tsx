@@ -98,7 +98,7 @@ function CreateRoom({
 
         toast({
           title: 'Sala criada',
-          description: 'Redirecionando...',
+          description: 'Entre com Nick e senha cadastrada...',
         });
 
         setIsOpen(false);

@@ -17,6 +17,8 @@ import InputPassword from './inputs/Password';
 import InputText from './inputs/Text';
 import { useNavigate } from 'react-router-dom';
 import { joinRoom } from '@/integration/Room';
+import { toast } from '@/hooks/use-toast';
+import { AxiosError } from 'axios';
 
 interface IButtonRoom {
   name: string;
@@ -32,7 +34,7 @@ const submitEnterSchema = z.object({
 
 type EnterFormData = z.infer<typeof submitEnterSchema>;
 
-function ButtonRoom({ name, max, codigo }: IButtonRoom) {
+function ButtonRoom({ name, quant, max, codigo }: IButtonRoom) {
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate(); // Hook para navegação
@@ -55,16 +57,16 @@ function ButtonRoom({ name, max, codigo }: IButtonRoom) {
         Cookie.set('codigoSala', codigo);
         Cookie.set('nick', data.nick);
         navigate(`/play`);
-      } else {
-        alert('Erro ao entrar na sala.');
       }
     } catch (error) {
-      console.error(
-        'Falha ao entrar na sala. Verifique os dados e tente novamente.',
-        error
-      );
+      const axiosError = error as AxiosError;
+      console.error('Erro ao entrar na sala:', axiosError);
+      toast({
+        title: 'Erro ao entrar na sala',
+        description: 'Sala completa, senha incorreta ou nick já utilizado...',
+      });
     }
-  }
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -94,7 +96,9 @@ function ButtonRoom({ name, max, codigo }: IButtonRoom) {
             <p>{name}</p>
           </div>
           <div className='flex gap-x-3'>
-            <p>{max}</p>
+            <p>
+              {quant}/{max}
+            </p>
             <div className='mt-[1px]'>
               <Group />
             </div>

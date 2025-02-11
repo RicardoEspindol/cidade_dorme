@@ -1,8 +1,9 @@
 import ButtonRoom from '@/components/ButtonRoom';
 import CreateRoom from '@/components/CreateRoom';
 import { getRooms } from '@/integration/Room';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import LoadingIcon from '../../public/icons/Loading';
+
 interface Estado {
   fase: string;
   vitima: string | null;
@@ -15,17 +16,19 @@ export interface Sala {
   nome: string;
   codigo: string;
   senha: string;
-  jogadores: unknown[]; // Substitua `any[]` por uma interface mais específica se souber a estrutura dos jogadores
+  jogadores: unknown[];
   jogoIniciado: boolean;
   estado: Estado;
   quantidadeJogadores: number;
 }
+
 function Room() {
   const [rooms, setRooms] = useState<Sala[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Começa carregando na primeira renderização
+  const isFirstLoad = useRef(true); // Referência para identificar a primeira chamada
+
   useEffect(() => {
-    const fetchGetLoan = async () => {
-      setIsLoading(true);
+    const fetchGetRooms = async () => {
       try {
         const response = await getRooms();
         setRooms(response);
@@ -35,10 +38,18 @@ function Room() {
         }
         setRooms([]);
       } finally {
-        setIsLoading(false);
+        if (isFirstLoad.current) {
+          setIsLoading(false); // Desativa o loading apenas na primeira vez
+          isFirstLoad.current = false; // Marca que a primeira chamada já aconteceu
+        }
       }
     };
-    fetchGetLoan();
+
+    fetchGetRooms(); // Chamada inicial
+
+    const interval = setInterval(fetchGetRooms, 4000); // Atualização periódica
+
+    return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
   }, []);
 
   return (
@@ -61,9 +72,9 @@ function Room() {
                 <ButtonRoom
                   key={index}
                   name={item.nome}
-                  quant={item.quantidadeJogadores}
+                  quant={item.jogadores.length}
                   max={item.quantidadeJogadores}
-                  codigo={item.codigo} // Passando o código da sala
+                  codigo={item.codigo}
                 />
               ))}
             </div>
@@ -78,4 +89,5 @@ function Room() {
     </>
   );
 }
+
 export default Room;

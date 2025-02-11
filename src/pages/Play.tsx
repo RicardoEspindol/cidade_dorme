@@ -6,6 +6,9 @@ import Cookie from 'js-cookie';
 import { useEffect, useState } from 'react';
 import { destroyRoom, getRoomId, initGame } from '@/integration/Room';
 import LoadingIcon from '../../public/icons/Loading';
+import { toast } from '@/hooks/use-toast';
+import { AxiosError } from 'axios';
+import { GameData } from './Game';
 
 interface Player {
   nome: string;
@@ -18,20 +21,51 @@ function Play() {
   const id = Cookie.get('codigoSala');
   const [players, setPlayers] = useState<Player[]>([]);
   const [playerNames, setPlayerNames] = useState<{ [key: string]: string }>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [nameRoom, setNameRoom] = useState('');
+  const [sala, setSala] = useState<GameData>()!;
   const navigate = useNavigate();
 
   if (!id) {
     throw new Error('Sala não encontrada.');
   }
+
+  useEffect(() => {
+      const fetchPlayers = async () => {
+      try {
+        const response = await getRoomId(id);
+        console.log('API Response:', response);
+        setSala(response);
+      } catch (error) {
+        console.error('Erro ao buscar jogadores:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlayers();
+    const interval = setInterval(fetchPlayers, 2000); // Atualização periódica
+
+    return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+  }, [id, setSala]);
   const initGameFunction = async () => {
     try {
       setIsLoading(true);
-      await initGame(id);
-      navigate('/game'); // Redireciona para /game após iniciar o jogo
+      const response = await initGame(id);
+      if (response.status === 200) {
+        toast({
+          title: 'Jogo iniciado',
+          description: 'Verifique o status da sala e vote quando necessário...',
+        });
+        navigate('/game'); // Redireciona para /game após iniciar o jogo
+      }
     } catch (error) {
-      console.error('Erro ao iniciar o jogo:', error);
+      const axiosError = error as AxiosError;
+      console.error('Erro ao entrar na sala:', axiosError);
+      toast({
+        title: 'Erro ao iniciar partida',
+        description: 'A sala precisa conter 6 participantes...',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -39,10 +73,21 @@ function Play() {
   const destroyGameFunction = async () => {
     try {
       setIsLoading(true);
-      await destroyRoom(id);
-      navigate('/room'); // Redireciona para /game após iniciar o jogo
+      const response = await destroyRoom(id);
+
+      if (response.status === 204) {
+        toast({
+          title: 'Sala deletada',
+          description: 'Crie uma outra ou entre em uma de um amigo...',
+        });
+        navigate('/room'); // Redireciona para a página de salas
+      }
     } catch (error) {
       console.error('Erro ao destruir o jogo:', error);
+      toast({
+        title: 'Erro ao deletar sala',
+        description: 'Erro desconhecido, deu muito ruim...',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +95,6 @@ function Play() {
 
   useEffect(() => {
     const fetchPlayers = async () => {
-      setIsLoading(true);
       try {
         const response = await getRoomId(id);
         console.log('API Response:', response); // <-- Verifica o formato da resposta
@@ -84,7 +128,17 @@ function Play() {
     };
 
     fetchPlayers();
+
+    const interval = setInterval(fetchPlayers, 2000); // Atualização periódica
+
+    return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
   }, [id]);
+
+  useEffect(() => {
+    if (sala && sala?.jogoIniciado) {
+      navigate('/game');
+    }
+  }, [navigate, sala, sala?.jogoIniciado]);
 
   return (
     <>
